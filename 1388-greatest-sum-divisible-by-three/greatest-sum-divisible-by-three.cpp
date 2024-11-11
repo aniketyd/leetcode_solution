@@ -1,29 +1,30 @@
+#include <vector>
+#include <algorithm>
+#include <iostream>
+#include <cstring>
+
 class Solution {
 public:
-int dp[40005][4];
-   int fun(vector<int>&v,int i,int m){
-       if(i<0){
-        if(m==0)
-        return 0;
-        return -1e9;
-       }
-       if(dp[i][m]!=-1)return dp[i][m];
-       int res;
-       res=fun(v,i-1,m);
-       res=max(res,fun(v,i-1,(m+v[i]%3)%3)+v[i]);
-       return dp[i][m]=res;
-   }
-    int maxSumDivThree(vector<int>& nums) {
-        int n=nums.size();
-        vector<int>v;
-        int sum=0;
-        for(int i=0;i<n;i++){
-            if(nums[i]%3==0)sum+=nums[i];
-          else v.push_back(nums[i]);
-            
+    int maxSumDivThree(std::vector<int>& nums) {
+        // Initialize a dp array of size 3 for storing max sums with remainders 0, 1, and 2
+        std::vector<int> dp(3, -1e9);
+        dp[0] = 0;  // Base case: sum 0 with remainder 0 is achievable with no elements
+
+        for (int num : nums) {
+            // Copy the current state to update based on it (to avoid overwriting during iteration)
+            std::vector<int> dpNew = dp;
+
+            for (int m = 0; m < 3; m++) {
+                if (dp[m] != -1e9) {  // If there's a valid sum with remainder m
+                    int newRemainder = (m + num % 3) % 3;
+                    dpNew[newRemainder] = std::max(dpNew[newRemainder], dp[m] + num);
+                }
+            }
+
+            dp = dpNew;  // Update dp to reflect changes made in dpNew
         }
-        memset(dp,-1,sizeof(dp));
-        sum+=fun(v,v.size()-1,0);
-return sum;
+
+        // Result is the maximum sum with remainder 0 (sum divisible by 3)
+        return dp[0];
     }
 };
