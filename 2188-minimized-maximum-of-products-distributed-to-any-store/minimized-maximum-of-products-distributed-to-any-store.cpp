@@ -11,7 +11,7 @@ public:
     }
     int minimizedMaximum(int n, vector<int>& q) {
         int m=q.size();
-        int low=1,high=1e9;
+        int low=1,high=1e5;
         int ans;
         while(low<=high){
             int mid=(low)+(high-low)/2;
