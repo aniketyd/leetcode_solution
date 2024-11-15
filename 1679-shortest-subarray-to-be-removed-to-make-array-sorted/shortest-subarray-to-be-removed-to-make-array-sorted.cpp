@@ -17,10 +17,12 @@ public:
         }
         if(indx1>=indx2)return 0;
         int ans=max(indx1+1,n-indx2);
+
         for(int i=0;i<=indx1;i++){
-        int it=lower_bound(arr.begin()+indx2,arr.end(),arr[i])-arr.end();
-        
-            ans=max(ans,-1*it+i+1);
+            while(indx2<n&&arr[indx2]<arr[i]){
+                indx2++;
+            }
+            ans=max(ans,n-indx2+i+1);
         }
         return n-ans;
 
