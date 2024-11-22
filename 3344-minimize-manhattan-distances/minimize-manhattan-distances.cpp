@@ -54,7 +54,7 @@ public:
                 idx2=i;
             }
          }
-         cout<<indx1<<' '<<indx2<<endl;
+        
          ans=min(fun(pt,indx1,n),fun(pt,indx2,n));
          return ans;
 
