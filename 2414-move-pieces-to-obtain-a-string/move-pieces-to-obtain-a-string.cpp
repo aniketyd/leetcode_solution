@@ -2,18 +2,27 @@ class Solution {
 public:
     bool canChange(string start, string target) {
         int n=start.size();
-        vector<pair<char,int>>v,b;
-        for(int i=0;i<n;i++){
-            if(start[i]!='_')v.push_back({start[i],i});
-            if(target[i]!='_')b.push_back({target[i],i});
+        int i=0,j=0;
+        while(i<n&&j<n){
+            while(i<n&&start[i]=='_')
+            i++;
+            while(j<n&&target[j]=='_')
+            j++;
+            if(i==n&&j==n)return true;
+            if(i==n||j==n)return false;
+            if(start[i]!=target[j])return false;
+            if(start[i]=='L'&&i<j)return false;
+            if(start[i]=='R'&&i>j)return false;
+            i++;
+            j++;
         }
-        if(b.size()!=v.size())return false;
-        
-        for(int i=0;i<v.size();i++){
-            if(v[i].first!=b[i].first)return false;
-            if(v[i].first=='L'&&b[i].second>v[i].second)return false;
-             if(v[i].first=='R'&&b[i].second<v[i].second)return false;
+        while(i<n&&start[i]=='_'){
+            i++;
         }
-        return true;
+         while(j<n&&target[j]=='_'){
+            j++;
+        }
+        if(i==n&&j==n)return true;
+        return false;
     }
 };
