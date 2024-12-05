@@ -3,7 +3,7 @@ public:
     bool canChange(string start, string target) {
         int n=start.size();
         int i=0,j=0;
-        while(i<n&&j<n){
+        while(i<n||j<n){
             while(i<n&&start[i]=='_')
             i++;
             while(j<n&&target[j]=='_')
@@ -16,13 +16,7 @@ public:
             i++;
             j++;
         }
-        while(i<n&&start[i]=='_'){
-            i++;
-        }
-         while(j<n&&target[j]=='_'){
-            j++;
-        }
-        if(i==n&&j==n)return true;
-        return false;
+     return true;
+       
     }
 };
