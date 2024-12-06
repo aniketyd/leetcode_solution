@@ -11,7 +11,7 @@ public:
             mp[operations[i][1]]=mp[operations[i][0]];
             mp[operations[i][0]]=-1;
         }
-        for(auto val:mp){
+        for(auto &val:mp){
             if(val.second!=-1)
             nums[val.second]=val.first;
         }
