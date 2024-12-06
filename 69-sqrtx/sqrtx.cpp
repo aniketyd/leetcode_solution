@@ -5,7 +5,7 @@ public:
        int ans;
        while(low<=high){
         int mid=low+(high-low)/2;
-        long long res=1LL*mid*mid;
+         long res=1LL*mid*mid;
         if(res<=x){
             ans=mid;
             low=mid+1;
