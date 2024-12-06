@@ -4,24 +4,18 @@ public:
         
         int n=nums.size();
         if(n<3)return false;
-        multiset<int>st;
-        for(int i=2;i<n;i++)st.insert(nums[i]);
-        int mi=nums[0];
-        for(int i=1;i<n-1;i++){
-            if(mi<nums[i]){
-                auto it=st.upper_bound(mi);
-               
-                if(it!=st.end()){
-                    
-                    if((*it)<nums[i]){
-                        return true;
-                    }
+        stack<int>st;
+        int mi=INT_MIN;
+        for(int i=n-1;i>=0;i--){
+            if(nums[i]<mi)return true;
+            else
+            {
+                while(!st.empty()&&st.top()<nums[i]){
+                    mi=st.top();
+                    st.pop();
                 }
-                  
             }
-            mi=min(mi,nums[i]);
-            auto itt=st.find(nums[i+1]);
-            st.erase(itt);
+            st.push(nums[i]);
         }
         return false;
     }
