@@ -11,7 +11,7 @@ public:
            return sum>=k;
         };
         int ans=0;
-        int low=1,high=1e9;
+        int low=1,high=*max_element(nums.begin(),nums.end());
         while(low<=high){
             int mid=low+(high-low)/2;
             if(help(mid)){
