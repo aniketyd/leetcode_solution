@@ -26,7 +26,7 @@ public:
             if(j==n&&nums[dq.front()]-nums[ddq.front()]<=limit)
             ans=max(ans,j-i);
             ans=max(ans,j-i-1);
-            cout<<i<<' '<<ans<<' '<<j<<endl;
+            
            
             
         }
