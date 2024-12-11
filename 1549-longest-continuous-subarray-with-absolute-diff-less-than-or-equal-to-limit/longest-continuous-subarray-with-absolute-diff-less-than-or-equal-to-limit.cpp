@@ -1,35 +1,30 @@
-class Solution {
-public:
-    int longestSubarray(vector<int>& nums, int limit) {
-        int n=nums.size();
-        deque<int>dq,ddq;
-        int ans=-1;
-        int j=0;
-        for(int i=0;i<n;i++){
- while(dq.size()>0&&dq.front()<i)
-            dq.pop_front();
-            while(ddq.size()>0&&ddq.front()<i)
-            ddq.pop_front();
+ 
 
-            while(j<n&&(dq.empty()||nums[dq.front()]-nums[ddq.front()]<=limit)){
-            while(dq.size()>0&&nums[dq.back()]<=nums[j]){
-                dq.pop_back();
-            }
-            while(ddq.size()>0&&nums[ddq.back()]>=nums[j]){
-                ddq.pop_back();
-            }
-           
-            dq.push_back(j);
-            ddq.push_back(j);
-            ++j;
-            }
-            if(j==n&&nums[dq.front()]-nums[ddq.front()]<=limit)
-            ans=max(ans,j-i);
-            ans=max(ans,j-i-1);
-            
-           
-            
-        }
-        return ans;
+#include <bits/stdc++.h>
+using namespace std;
+
+class Solution {
+ public:
+  int longestSubarray(const vector<int>& nums, const int limit) {
+    deque<int> maxDeque, minDeque;  // Store indices of nums for max/min
+    int j = 0, ans = 1;
+
+    for (int i = 0; i < nums.size(); i++) {
+      while (!maxDeque.empty() && nums[maxDeque.back()] <= nums[i]) maxDeque.pop_back();
+      maxDeque.push_back(i);
+
+      while (!minDeque.empty() && nums[minDeque.back()] >= nums[i]) minDeque.pop_back();
+      minDeque.push_back(i);
+
+      while (nums[maxDeque.front()] - nums[minDeque.front()] > limit) {
+        if (maxDeque.front() == j) maxDeque.pop_front();
+        if (minDeque.front() == j) minDeque.pop_front();
+        j++;
+      }
+
+      ans = max(ans, i - j + 1);
     }
+
+    return ans;
+  }
 };
