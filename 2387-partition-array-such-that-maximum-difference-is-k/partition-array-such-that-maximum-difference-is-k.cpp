@@ -2,13 +2,26 @@ class Solution {
 public:
     int partitionArray(vector<int>& nums, int k) {
         sort(nums.begin(),nums.end());
-        int n=nums.size();
-       int i=0,c=0;
-       while(i<n){
-          auto it=lower_bound(nums.begin(),nums.end(),nums[i]+k+1)-nums.begin();
-          c++;
-          i=it;
-       }
-       return c;
+        int st = 0;
+        int count =0;
+        for(int i = 0;i<nums.size();i++)
+        {
+            if(nums[i]-nums[st]<=k)
+            {
+                if(i == nums.size()-1)
+                {
+                    count++;
+                }
+                continue;
+            }
+            else
+            {
+                    count++;
+                    st = i;
+                    i--;
+            }
+
+        }
+        return count;
     }
 };
