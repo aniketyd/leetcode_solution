@@ -1,24 +1,25 @@
 class Solution {
 public:
     long long findScore(vector<int>& nums) {
-        int n=nums.size();
-        priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>>pq;
-        for(int i=0;i<n;i++){
-            pq.push({nums[i],i});
+        int n = nums.size();
+        vector<pair<int, int>> numIndex(n);
+        for (int i = 0; i < n; i++) {
+            numIndex[i] = {nums[i], i};
         }
-        long long sum=0;
-        while(!pq.empty()){
-        auto t=pq.top();
-        if(nums[t.second]!=-1){
-            sum+=t.first;
-            if(t.second-1>=0)
-            nums[t.second-1]=-1;
-            if(t.second+1<n)
-            nums[t.second+1]=-1;
-        }
-        pq.pop();
 
+        sort(numIndex.begin(), numIndex.end());
+
+        long long score = 0;
+        vector<bool> marked(n, false);
+        for (int i = 0; i < n; i++) {
+            if (!marked[numIndex[i].second]) {
+                score += numIndex[i].first;
+                marked[max(numIndex[i].second - 1, 0)] = true;
+                marked[numIndex[i].second] = true;
+                marked[min(numIndex[i].second + 1, n - 1)] = true;
+            }
         }
-        return sum;
+
+        return score;
     }
 };
