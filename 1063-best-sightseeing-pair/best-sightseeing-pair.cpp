@@ -1,17 +1,18 @@
 class Solution {
 public:
     int maxScoreSightseeingPair(vector<int>& values) {
-        int n=values.size();
-        int ans=0;
-        deque<int>q;
-        for(int i=0;i<n;i++){
-            if(q.size()>0)
-             ans=max(ans,q.front()-i+values[q.front()]+values[i]);
-            while(!q.empty()&&q.back()-i+values[q.back()]<=values[i]){
-                q.pop_back();
+         int n=values.size();
+         vector<int>dp(n+1);
+         for(int i=0;i<n;i++){
+            if(i==0)dp[i]=values[i];
+            else{
+                dp[i]=max(values[i],dp[i-1]-1);
             }
-             q.push_back(i);
-        }
-        return ans;
+         }
+         int ans=0;
+         for(int i=1;i<n;i++){
+            ans=max(ans,dp[i-1]+values[i]-1);
+         }
+         return ans;
     }
 };
