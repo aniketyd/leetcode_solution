@@ -12,9 +12,9 @@ public:
         for(int j=1;j<=3;j++){
             for(int i=j*k;i<=n;i++){
               dp[i][j]=max(dp[i-1][j],pf[i]-pf[i-k]+dp[i-k][j-1]);
-              cout<<dp[i][j]<<' ';
+              
 
-            }cout<<endl;
+            }
         }
         vector<int>ans;
         int i;
