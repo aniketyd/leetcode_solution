@@ -1,6 +1,6 @@
 select machine_id,
-round(sum(case
+round(avg(case
 when activity_type='end' then timestamp
-else -1*timestamp end)/count(distinct process_id),3) as processing_time
+else -1*timestamp end)*2,3) as processing_time
 from activity
 group by machine_id;
