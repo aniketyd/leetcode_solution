@@ -1,65 +1,52 @@
 class Solution {
 public:
- struct Node {
-    int val,x,y;
+    vector<int> maxPoints(vector<vector<int>>& grid, vector<int>& queries) {
+        int r = grid.size(), c = grid[0].size(), n = queries.size();
+        vector<int> ans(n, 0);
+        vector<vector<bool>> visited(r, vector<bool>(c, false));
 
-    
-    Node(int _val, int _x, int _y) : val(_val), x(_x), y(_y) {}
-};
+        // Directions for 4-way movement
+        vector<vector<int>> dir = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
 
-struct Compare {
-    bool operator()(const Node& a, const Node& b) {
-        return a.val > b.val; 
-    }
-};
-    vector<int> maxPoints(vector<vector<int>>& grid, vector<int>& q) {
-        int n=grid.size();
-        int m=grid[0].size();
-        int adx[4]={0,1,0,-1};
-        int ady[4]={1,0,-1,0};
-        priority_queue<Node, vector<Node>, Compare> pq;
-        vector<vector<int>>v(n,vector<int>(m,1e7));
-        pq.push(Node(grid[0][0],0,0));
-        v[0][0]=grid[0][0];
-        while(!pq.empty()){
-            auto it=pq.top();int x=it.x,y=it.y;pq.pop();
-            if(it.val>v[x][y])continue;
-            for(int i=0;i<4;i++){
-                int nx=adx[i]+x;
-                int ny=ady[i]+y;
-                
-                if(nx>=0&&nx<n&&ny>=0&&ny<m&&v[nx][ny]>max(grid[nx][ny],it.val)){
-                    v[nx][ny]=max(grid[nx][ny],it.val);
-                    pq.push(Node(max(grid[nx][ny],it.val),nx,ny));
+        // Min-heap to process queries in increasing order
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> pq;
+        for (int i = 0; i < n; i++) {
+            pq.push({queries[i], i});
+        }
+
+        // Min-heap for grid traversal (to get the smallest unvisited value)
+        priority_queue<pair<int, pair<int, int>>, vector<pair<int, pair<int, int>>>, greater<>> gridHeap;
+        gridHeap.push({grid[0][0], {0, 0}});
+        visited[0][0] = true;
+
+        int count = 0;
+        int lastQueryValue = -1;
+
+        while (!pq.empty()) {
+            int queryVal = pq.top().first;
+            int queryIndex = pq.top().second;
+            pq.pop();
+
+            // Process BFS for new reachable cells
+            while (!gridHeap.empty() && gridHeap.top().first < queryVal) {
+                int val = gridHeap.top().first;
+                int row = gridHeap.top().second.first;
+                int col = gridHeap.top().second.second;
+                gridHeap.pop();
+                count++;
+
+                for (const auto& d : dir) {
+                    int newRow = row + d[0];
+                    int newCol = col + d[1];
+
+                    if (newRow >= 0 && newRow < r && newCol >= 0 && newCol < c && !visited[newRow][newCol]) {
+                        gridHeap.push({grid[newRow][newCol], {newRow, newCol}});
+                        visited[newRow][newCol] = true;
+                    }
                 }
             }
-        }
-        map<int,int>mp;
-        for(int i=0;i<n;i++){
-            for(int j=0;j<m;j++){
-                if(v[i][j]<=1e6){
-                    mp[v[i][j]]++;
-                }
-            }
-        }
-        vector<pair<int,int>>anss;
-        vector<int>ans;
-        int sum=0;
-        for(auto val:mp){
-            sum+=val.second;
-            anss.push_back({val.first,sum});
-        }
-        for(int i=0;i<q.size();i++){
-           auto it = upper_bound(anss.begin(), anss.end(), make_pair(q[i], 0)) - anss.begin();
- 
-            if(it==0)
-            ans.push_back(0);
-            else{
-                --it;
-                ans.push_back(anss[it].second);
-            }
+            ans[queryIndex] = count;
         }
         return ans;
-
     }
 };
