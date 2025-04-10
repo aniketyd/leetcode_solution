@@ -1,25 +1,26 @@
-class Solution {
+class Solution 
+{
 public:
-    int numberOfPaths(vector<vector<int>>& grid, int k) {
-        // Notice that k is till 50
-        // (a+b)%k = (a%k + b%k)%k;
-        int m = grid.size(), n = grid[0].size(), mod=1000000000 + 7;
-        vector<vector<vector<int>>> dp(m, vector<vector<int>> (n, vector<int> (k,0)));
-        dp[m-1][n-1][grid[m-1][n-1]%k] = 1;
-        for(int i=m-1;i>=0;i--){
-            for(int j=n-1;j>=0;j--){
-                if(i+1<m){
-                    for(int l=0;l<k;l++){
-                        dp[i][j][(grid[i][j]+l)%k]=(dp[i][j][(grid[i][j]+l)%k]+dp[i+1][j][l])%mod;
-                    }
-                }
-                if(j+1<n){
-                    for(int l=0;l<k;l++){
-                        dp[i][j][(grid[i][j]+l)%k]=(dp[i][j][(grid[i][j]+l)%k]+dp[i][j+1][l])%mod;
-                    }
-                }
-            }
-        }
-        return dp[0][0][0];
+    int mod = 1e9+7;
+    int help(int i, int j, int sum, int &k, vector<vector<int>> &grid, vector<vector<vector<int>>> &dp)
+    {
+        if(i<0 || j<0) return 0;
+        
+        if(i==0 && j==0) return (sum + grid[0][0])%k==0;
+        
+        if(dp[i][j][sum]!=-1) return dp[i][j][sum];
+        
+        int top = help(i-1, j, (sum+grid[i][j])%k, k, grid, dp);
+        
+        int left = help(i, j-1, (sum+grid[i][j])%k, k, grid, dp);
+        
+        return dp[i][j][sum]=(top+left)%mod;
+    }
+    
+    int numberOfPaths(vector<vector<int>>& grid, int k) 
+    {
+        int m=grid.size(), n=grid[0].size();
+        vector<vector<vector<int>>> dp(m, vector<vector<int>> (n, vector<int> (k, -1)));
+        return help(m-1, n-1, 0, k, grid, dp);
     }
 };
