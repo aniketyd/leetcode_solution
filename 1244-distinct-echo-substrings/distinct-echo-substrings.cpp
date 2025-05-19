@@ -1,26 +1,23 @@
 class Solution {
 public:
     int distinctEchoSubstrings(string text) {
-       if(text[0]=='a'&&text.size()==2000)return 1000;
+       
         int n=text.size();
        int fans=0;
         for(int i=1;i<=text.size()/2;i++){
-            string str="";
+            int str=0;
         unordered_set<string>ans;
            for(int j=0;j+i<text.size();j++){
                if(text[j]==text[j+i]){
-                if(str.size()<i){
-                    str+=text[j];
+                if(str<i){
+                    str++;
                 }
-                else{
-                    str=str.substr(1);
-                    str+=text[j];
-                }
-                if(str.size()==i&&ans.find(str)==ans.end())
-                ans.insert(str);
+            
+                if(str==i)
+                ans.insert(text.substr(j-str+1,str));
                }
                else
-               str="";
+               str=0;
            }
            fans+=(int)ans.size();
         }
