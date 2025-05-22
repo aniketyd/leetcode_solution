@@ -1,42 +1,36 @@
+// a standard Disjoint Set Union class template
+class DSU {
+    public:
+    vector<int> par, sz;
+    DSU(int n) : par(n), sz(n,1) {
+        iota(begin(par), end(par), 0);                         // initializes each node's parent to be itself - fills as [0,1,2,3,...,n]
+    }
+    int find(int x) {
+        if(par[x] == x) return x;                              // x is itself the parent of the component that it belongs to
+        return par[x] = find(par[x]);                          // update parent of x before returning for each call -path compression
+    }
+    bool Union(int x, int y) {
+        int xp = find(x), yp = find(y);                        // find parents of x and y, i.e, representatives of components that x and y belong to
+        if(xp == yp) return false;                             // x and y already belong to same component - not possible to union
+        if(sz[xp] > sz[yp]) par[yp] = par[xp], sz[xp] += sz[yp];   // union by size - join smaller sized to bigger one
+        else par[xp] = par[yp], sz[yp] += sz[xp];
+        return true;
+    }
+};
 class Solution {
 public:
-    void dfs(int node,vector<vector<int>>&adj,int &cnt,unordered_set<int>&check,vector<int>&vis){
-        vis[node]=1;
-       
-        if(check.find(node)!=check.end())cnt++;
-        for(auto nextNode:adj[node]){
-            if(vis[nextNode]==0)
-            dfs(nextNode,adj,cnt,check,vis);
-        }
-    }
     int largestComponentSize(vector<int>& nums) {
-        int n=nums.size();
-        vector<vector<int>>adj(1e5+1);
-        unordered_set<int>check;
-        for(int i=0;i<n;i++){
-            check.insert(nums[i]);
-            for(int j=2;j*j<=nums[i];j++){
-               if(nums[i]%j==0) {
-                
-                    int q=nums[i]/j;
-                    
-                    adj[j].push_back(nums[i]);
-                    adj[nums[i]].push_back(j);
-                    adj[q].push_back(nums[i]);
-                    adj[nums[i]].push_back(q);
-                }
-            }
-        }
-        vector<int>vis(1e5+1);
-        int ans=0;
-        for(int i=1;i<=1e5;i++){
-            if(vis[i]==0){
-                int cnt=0;
-                dfs(i,adj,cnt,check,vis);
-                 ans=max(ans,cnt);
-            }
-            
-        }
+        int n = size(nums), ans = 1;
+        DSU ds(*max_element(begin(nums), end(nums)) + 1);      // max(nums) is largest element that will be stored in DSU
+        unordered_map<int, int> mp;                            // maintains {parent of component: frequency}
+        for(auto c : nums) 
+            for(int f = 2; f <= sqrt(c); f++)                  // finding factors of each element
+                if(c % f == 0)                                 // if f divides c, then f & c/f are its factor. So union them
+                    ds.Union(c, f), 
+                    ds.Union(c, c/f);
+        
+        for(int i = 0; i < n; i++)                             // iterate and find parent that is seen most. It'll give the largest group
+            ans = max(ans, ++mp[ds.find(nums[i])]);
         return ans;
     }
 };
