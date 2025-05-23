@@ -1,50 +1,56 @@
 class Solution {
+    enum Orientation {
+        RIGHT = 0,
+        DOWN = 1
+    };
 public:
-    int minimumMoves(vector<vector<int>>&grid){
-        int n=grid.size(),ans=0;
-        map<pair<int,pair<int,int>>,int>mp;
-        queue<pair<int,pair<int,int>>>q;
-        
-        q.push({0,{0,1}});
-        mp[{0,{0,1}}]++;
-        int i=0;
-        while(q.size()>0){
-            int m=q.size();
-            while(m--)
-            {
-                int x=q.front().second.first,y=q.front().second.second,pos=q.front().first;
-                q.pop();
-                if(x==n-1 && y==n-1 && pos==0)return ans;
-                if(pos==0)
-                {
-                    if(y+1<n && grid[x][y+1]==0 && mp.find({0,{x,y+1}})==mp.end()){
-                        q.push({0,{x,y+1}});
-                        mp[{0,{x,y+1}}]++;
+    int minimumMoves(vector<vector<int>>& grid) {
+        int n = grid.size();
+        bool vis[2][n][n];
+        memset(vis, false, sizeof(vis));
+        queue<array<int, 4>> q;
+        q.push({RIGHT, 0, 1, 0});
+        vis[RIGHT][0][1] = true;
+        while (!q.empty()) {
+            auto [direction, r, c, dist] = q.front();
+            q.pop();
+            if (direction == RIGHT && r == n - 1 && c == n - 1) return dist;
+            switch (direction) {
+                case RIGHT:
+                    if (c + 1 < n && !vis[RIGHT][r][c + 1] && grid[r][c + 1] == 0) {
+                        vis[RIGHT][r][c + 1] = true;
+                        q.push({RIGHT, r, c + 1, dist + 1});
                     }
-                    if(x+1<n && grid[x+1][y]==0 && grid[x+1][y-1]==0 && mp.find({0,{x+1,y}})==mp.end()){
-                        q.push({0,{x+1,y}});
-                        mp[{0,{x+1,y}}]++;
+                    if (r + 1 < n && grid[r + 1][c] + grid[r + 1][c - 1] == 0) {
+                        if (!vis[RIGHT][r + 1][c]) {
+                            vis[RIGHT][r + 1][c] = true;
+                            q.push({RIGHT, r + 1, c, dist + 1});
+                        }
+                        if (!vis[DOWN][r + 1][c - 1]) {
+                            vis[DOWN][r + 1][c - 1] = true;
+                            q.push({DOWN, r + 1, c - 1, dist + 1});
+                        }
                     }
-                    if(x+1<n && grid[x+1][y]==0 && grid[x+1][y-1]==0 && mp.find({1,{x+1,y-1}})==mp.end()){
-                        q.push({1,{x+1,y-1}});
-                        mp[{1,{x+1,y-1}}]++;
+                    break;
+                case DOWN:
+                    if (r + 1 < n && !vis[DOWN][r + 1][c] && grid[r + 1][c] == 0) {
+                        vis[DOWN][r + 1][c] = true;
+                        q.push({DOWN, r + 1, c, dist + 1});
                     }
-                }else{
-                    if(x+1<n && grid[x+1][y]==0 && mp.find({1,{x+1,y}})==mp.end()){
-                        q.push({1,{x+1,y}});
-                        mp[{1,{x+1,y}}]++;
+                    if (c + 1 < n && grid[r][c + 1] + grid[r - 1][c + 1] == 0) {
+                        if (!vis[DOWN][r][c + 1]) {
+                            vis[DOWN][r][c + 1] = true;
+                            q.push({DOWN, r, c + 1, dist + 1});
+                        }
+                        if (!vis[RIGHT][r - 1][c + 1]) {
+                            vis[RIGHT][r - 1][c + 1] = true;
+                            q.push({RIGHT, r - 1, c + 1, dist + 1});
+                        }
                     }
-                    if(y+1<n && grid[x][y+1]==0 && grid[x-1][y+1]==0 && mp.find({1,{x,y+1}})==mp.end()){
-                         q.push({1,{x,y+1}});
-                         mp[{1,{x,y+1}}]++;
-                    }
-                    if(y+1<n && grid[x][y+1]==0 && grid[x-1][y+1]==0 && mp.find({0,{x-1,y+1}})==mp.end()){
-                         q.push({0,{x-1,y+1}});
-                         mp[{0,{x-1,y+1}}]++;
-                    }
-                }
-            }
-            ans++;
+                    break;
+                default:
+                    // Do nothing
+            };
         }
         return -1;
     }
