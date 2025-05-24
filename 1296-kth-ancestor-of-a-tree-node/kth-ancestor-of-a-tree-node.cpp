@@ -1,41 +1,32 @@
 class TreeAncestor {
 public:
-vector<vector<int>>adj;
-unordered_map<int,unordered_map<int,int>>dp;
-    void dfs(int node,int parent){
-   
-        dp[node][0]=parent;
-       for(int i=1;i<20;i++){
-        dp[node][i]=dp[dp[node][i-1]][i-1];
-       }
-       
-       for(auto adjnd:adj[node]){
-        if(adjnd!=parent){
-            dfs(adjnd,node);
-        }
-       }
-    }
+    vector<vector<int>> dp;
+    int nodes;
+
     TreeAncestor(int n, vector<int>& parent) {
-        adj.resize(n+1);
-        
-        for(int i=1;i<n;i++){
-            adj[i].push_back(parent[i]);
-            adj[parent[i]].push_back(i);
+        dp.resize(n,vector<int>(16,-1));
+        nodes=n;
+        for(int i=0;i<n;i++){
+            dp[i][0] = parent[i];
         }
-        for(int i=0;i<20;i++)
-        dp[-1][i]=-1;
-        dfs(0,-1);
+        for(int i=1;i<16;i++){
+            for(int j=0;j<n;j++){
+                if(dp[j][i-1] != -1){
+                    dp[j][i]=dp[dp[j][i-1]][i-1];
+                }
+            }
+        }
     }
     
     int getKthAncestor(int node, int k) {
-        for(int i=0;i<20;i++){
-            if(k&(1<<i)){
-                node=dp[node][i];
-          
+        int x=0;
+        while(k>0 && node != -1){
+            if(k % 2 == 1){
+                node=dp[node][x];
             }
+            x++;
+            k = k >> 1;
         }
-       
-
         return node;
     }
 };
