@@ -1,55 +1,44 @@
 class Solution {
 public:
-    vector<vector<int>>coPrime;
-    vector<vector<int>>adj;
-    vector<int>ans;
-    set<pair<int,pair<int,int>>>st;
-  
-    void dfs(int node,int parent,vector<int>&nums,int currLevel){
-        int ancestorNode=-1,lvl=0;
-        for(auto pairVal:coPrime[nums[node]]){
-             auto it=st.lower_bound({pairVal,{-1e6,-1}});
-             if(it==st.end())continue;
-             auto val=(*it);
-             if(val.first==pairVal){
-                if(abs(val.second.first)>=lvl){
-                    ancestorNode=val.second.second;
-                    lvl=abs(val.second.first);
+    void dfs(int node,int parent,int depth,vector<pair<int,int>> &gg,vector<int> &ans,vector<vector<int>> &coprime,vector<int> &nums,vector<vector<int>> &adj){
+        int dep=-1;
+        int ances=-1;
+        for(int i=1;i<51;i++){
+            if(coprime[nums[node]][i])
+            {
+                auto it=gg[i];
+                if(it.second>dep){
+                    dep=it.second;
+                    ances=it.first;
                 }
-             }
-        }
-        ans[node]=ancestorNode;
-       
-        st.insert({nums[node],{-1*currLevel,node}});
-        for(auto adjNode:adj[node]){
-            if(adjNode!=parent){
-                dfs(adjNode,node,nums,currLevel+1);
             }
         }
-        auto it=st.find({nums[node],{-1*currLevel,node}});
-        if(it!=st.end())
-        st.erase(it);
-
+        ans[node]=ances;
+        pair<int, int> prev = gg[nums[node]];
+        gg[nums[node]] = {node, depth};
+        for (int child : adj[node]) {
+            if (child != parent) {
+                dfs(child, node, depth + 1,gg,ans,coprime,nums,adj);
+            }
+        }
+        gg[nums[node]] = prev;
     }
     vector<int> getCoprimes(vector<int>& nums, vector<vector<int>>& edges) {
-        int n=nums.size();
-        coPrime.resize(51);
-        adj.resize(n+1);
-        for(int i=0;i<edges.size();i++){
-             adj[edges[i][0]].push_back(edges[i][1]);
-             adj[edges[i][1]].push_back(edges[i][0]);
-        }
+        vector<vector<int>> coprime(51,vector<int>(51,-1));
         for(int i=1;i<51;i++){
-              for(int j=1;j<51;j++){
-                if(__gcd(i,j)==1){
-                    coPrime[i].push_back(j);
-                }
-              }
+            for(int j=1;j<51;j++){
+                coprime[i][j]=(__gcd(i,j)==1);
+            }
         }
-        ans.resize(n);
-        dfs(0,-1,nums,0);
+        int n=nums.size();
+        vector<vector<int>> adj(n);
+        for(auto it:edges){
+            adj[it[0]].push_back(it[1]);
+            adj[it[1]].push_back(it[0]);
+        }
+        vector<pair<int,int>> gg(51,{-1,-1});
+        vector<int> ans(n,-1);
+        dfs(0,-1,0,gg,ans,coprime,nums,adj);
         return ans;
-
-        
     }
 };
