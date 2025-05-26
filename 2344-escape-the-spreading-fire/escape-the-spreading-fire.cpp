@@ -1,93 +1,72 @@
 class Solution {
 public:
-    vector<vector<long>> a;
-    int n, m;
-    
-    bool good(long mn) {
-        vector<vector<bool>> vis(n, vector<bool> (m, 0));
-        vis[0][0] = 1;
-        
-        queue<array<long, 3>> q;
-        q.push({0, 0, mn});
-        
-        while(!q.empty()) {
-            int x = q.front()[0];
-            int y = q.front()[1];
-            long dis = q.front()[2];
-            
-            q.pop();
-            
-            if(x == n - 1 and y == m - 1) {
-                return 1;
-            }
-            if(a[x][y] <= dis) {
-                continue;
-            }
-            
-            int dx[] = {1, -1, 0, 0};
-            int dy[] = {0, 0, 1, -1};
-            
-            for(int t = 0; t < 4; ++t) {
-                int i = x + dx[t];
-                int j = y + dy[t];
-                
-                if(min(i, j) >= 0 and i < n and j < m and !vis[i][j] and a[x][y] != -1 and dis + 1 <= a[i][j]) {
-                    q.push({i, j, dis + 1});
-                    vis[i][j] = 1;
-                }
-            }
-        }
-        
-        return 0;
-    }
+    const int MAXI=1e9;
     int maximumMinutes(vector<vector<int>>& grid) {
-        n = grid.size(), m = grid[0].size();
-        
-        a.resize(n, vector<long> (m, 1e10));
-        
-        queue<pair<int, int>> q;
-        for(int i = 0; i < n; ++i) {
-            for(int j = 0; j < m; ++j) {
-                if(grid[i][j] == 1) {
-                    a[i][j] = 0;
-                    q.push({i, j});
-                } else if(grid[i][j] == 2) {
-                    a[i][j] = -1;
+        int n=grid.size(),m=grid[0].size();
+        vector<vector<int>>fireDistance(n,vector<int>(m,MAXI));
+        vector<vector<int>>manDistance(n,vector<int>(m,MAXI));
+        // lets first spread fire
+        queue<int>fire;
+        for(int i=0;i<n;i++){
+            for(int j=0;j<m;j++){
+                if(grid[i][j]==1){
+                    fireDistance[i][j]=0;
+                    fire.push(i*m+j);
                 }
             }
         }
-        
-        while(!q.empty()) {
-            int x = q.front().first;
-            int y = q.front().second;
-            q.pop();
-            
-            int dx[] = {1, -1, 0, 0};
-            int dy[] = {0, 0, 1, -1};
-            
-            for(int t = 0; t < 4; ++t) {
-                int i = x + dx[t];
-                int j = y + dy[t];
-                
-                if(min(i, j) >= 0 and i < n and j < m and a[i][j] != -1 and a[x][y] + 1 < a[i][j]) {
-                    a[i][j] = a[x][y] + 1;
-                    q.push({i, j});
+        vector<int>dx={0,1,0,-1};
+        vector<int>dy={1,0,-1,0};
+        while(!fire.empty()){
+            int node=fire.front();
+            fire.pop();
+            int i=node/m,j=node%m;
+            for(int k=0;k<4;k++){
+                int x=i+dx[k],y=j+dy[k];
+                if(x>=0 && x<n && y>=0 && y<m && grid[i][j]!=2 && fireDistance[x][y]==MAXI){
+                        fireDistance[x][y]=fireDistance[i][j]+1;
+                        fire.push(x*m+y);
                 }
             }
         }
-        
-        long l = 0, r = 1e9, best = -1;
-        
-        while(l <= r) {
-            long mid = l + (r - l) / 2;
-            if(good(mid)) {
-                best = mid;
-                l = mid + 1;
-            } else {
-                r = mid - 1;
+        queue<int>man;
+        manDistance[0][0]=0;
+        man.push(0);
+        while(!man.empty()){
+            int node=man.front();
+            man.pop();
+            int i=node/m,j=node%m;
+            for(int k=0;k<4;k++){
+                int x=i+dx[k],y=j+dy[k];
+                if(x>=0 && x<n && y>=0 && y<m && grid[i][j]!=2 && manDistance[x][y]==MAXI){
+                        manDistance[x][y]=manDistance[i][j]+1;
+                        man.push(x*m+y);
+                }
             }
         }
-        
-        return best;
+        if(manDistance[n-1][m-1]==MAXI)
+            return -1;
+        if(fireDistance[n-1][m-1]==MAXI)
+            return 1e9;
+        // we will encounter two cases here,
+        // 1. when fire and man both took same path
+        // 2. when take different path
+        int diff=fireDistance[n-1][m-1]-manDistance[n-1][m-1];
+        bool flag=false;
+        if(manDistance[n-1][m-2]+1==manDistance[n-1][m-1]){
+            if(fireDistance[n-1][m-2]-manDistance[n-1][m-2]>diff)
+                flag=flag||true;
+        }
+        if(manDistance[n-2][m-1]+1==manDistance[n-1][m-1]){
+            if(fireDistance[n-2][m-1]-manDistance[n-1][m-2]>diff)
+                flag=flag||true;
+        }
+        if(!flag)
+            diff--;
+        if(diff>=0)
+            return diff;
+        return -1;
+        // TC: O(N*M+N*M)
+        // SC: O(N*M+N*M)
     }
 };
