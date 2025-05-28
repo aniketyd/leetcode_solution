@@ -5,7 +5,7 @@ public:
     bool isMatch(string s, string p) {
         int n1=s.size();
         int n2=p.size();
-        vector<int>dp(n2+1,0);
+        vector<bool>dp(n2+1,0);
         dp[0]=1;
         for(int i=0;i<n2;i++){
             if(p[i]=='*')
@@ -14,7 +14,7 @@ public:
             break;
         }
         for(int i=1;i<=n1;i++){
-            vector<int>curDp(n2+1,0);
+            vector<bool>curDp(n2+1,0);
             for(int j=1;j<=n2;j++){
                 bool res=false;
                    if(p[j-1]=='?'||s[i-1]==p[j-1])
