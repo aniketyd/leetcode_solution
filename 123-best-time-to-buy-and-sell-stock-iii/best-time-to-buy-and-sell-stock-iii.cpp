@@ -1,41 +1,33 @@
 class Solution {
 public:
-    int rec(int i, int transNo, vector<int>& prices, vector<vector<int>>& dp)    {
-        /*base cond*/
-        if(transNo == 4 || i == prices.size())  {
-            //if we dont have a stock, then no transaction req -> return 0
-            //if we have a stockBought, we need to sell it now, therefore profit = 0 here -> return 0
+    int N;
+    int memo(int i, int j, int k, vector<int> &p, vector<vector<vector<int>>> &dp) {
+
+        if(i == 2 || j == N || k == 2)
             return 0;
-        }
 
-        /*dp check*/
-        if(dp[i][transNo] != -1) return dp[i][transNo];
+        if(dp[i][j][k] > -1)
+            return dp[i][j][k];
 
-        /*rec conds*/
-        int profit;
+        // skip current one 
+        int choice1 = memo(i, j + 1, k, p, dp);
+        
+        int choice2;
+        // if have bought and sell now
+        if(k == 1)
+            choice2 = p[j] + memo(i + 1, j + 1, k - 1, p, dp);
+        // buy now
+        else 
+            choice2 = -p[j] + memo(i, j + 1, k + 1, p, dp);
 
-        //has no stock right now
-        if(transNo == 0 || transNo == 2)  {       //can even do if(transNo % 2 == 0)
-            int buy = -prices[i] + rec(i+1, transNo+1, prices, dp);
-            int not_buy = rec(i+1, transNo, prices, dp);
-
-            profit = max(buy, not_buy);
-        }
-
-        //has stock right now
-        else if(transNo == 1 || transNo == 3) {   //can even do if(transNo % 2 != 0)
-            int sell = prices[i] + rec(i+1, transNo+1, prices, dp);
-            int not_sell = rec(i+1, transNo, prices, dp);
-
-            profit = max(sell, not_sell);
-        }
-
-        return dp[i][transNo] = profit;
+        return dp[i][j][k] = max(choice1, choice2);
     }
 
     int maxProfit(vector<int>& prices) {
-        int N=prices.size();
-        vector<vector<int>> dp(N, vector<int>(4, -1));
-        return rec(0,0, prices, dp);       //represents max profit
+        N = prices.size();
+        vector<vector<vector<int>>> dp(2, vector<vector<int>>(N, vector<int>(2, -1))); 
+        
+        return memo(0, 0, 0, prices, dp);
     }
+
 };
