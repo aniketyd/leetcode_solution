@@ -1,33 +1,21 @@
 class Solution {
 public:
-    int N;
-    int memo(int i, int j, int k, vector<int> &p, vector<vector<vector<int>>> &dp) {
-
-        if(i == 2 || j == N || k == 2)
-            return 0;
-
-        if(dp[i][j][k] > -1)
-            return dp[i][j][k];
-
-        // skip current one 
-        int choice1 = memo(i, j + 1, k, p, dp);
-        
-        int choice2;
-        // if have bought and sell now
-        if(k == 1)
-            choice2 = p[j] + memo(i + 1, j + 1, k - 1, p, dp);
-        // buy now
-        else 
-            choice2 = -p[j] + memo(i, j + 1, k + 1, p, dp);
-
-        return dp[i][j][k] = max(choice1, choice2);
-    }
-
     int maxProfit(vector<int>& prices) {
-        N = prices.size();
-        vector<vector<vector<int>>> dp(2, vector<vector<int>>(N, vector<int>(2, -1))); 
+        int n=prices.size();
+        vector<vector<vector<int>>>dp(n+1,vector<vector<int>>(3,vector<int>(2,0)));
         
-        return memo(0, 0, 0, prices, dp);
+        for(int i=n-1;i>=0;i--){
+            for(int j=1;j>=0;j--){
+                for(int k=0;k<2;k++){
+                    dp[i][j][k]=dp[i+1][j][k];
+                    if(k==1)
+                      dp[i][j][k]=max(dp[i][j][k],prices[i]+dp[i+1][j+1][0]);
+                      else
+                      dp[i][j][k]=max(dp[i][j][k],-1*prices[i]+dp[i+1][j][1]);
+                }
+            }
+        }
+        return dp[0][0][0];
     }
 
 };
