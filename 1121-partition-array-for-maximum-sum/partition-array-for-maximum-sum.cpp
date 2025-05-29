@@ -1,33 +1,17 @@
 class Solution {
 public:
-    int maxSum(vector<int>& arr, int k, int dp[], int start) {
-        int N = arr.size();
-        
-        if (start >= N) {
-            return 0;
-        }
-        
-        // Return the already calculated answer.
-        if (dp[start] != -1) {
-            return dp[start];
-        }
-        
-        int currMax = 0, ans = 0;
-        int end = min(N, start + k);
-        for (int i = start; i < end; i++) {
-            currMax = max(currMax, arr[i]);
-            // Store the maximum of all options for the current subarray.
-            ans = max(ans, currMax * (i - start + 1) + maxSum(arr, k, dp, i + 1));
-        }
-
-        // Store the answer to be reused.
-        return dp[start] = ans;
-    }
     
     int maxSumAfterPartitioning(vector<int>& arr, int k) {
-        int dp[arr.size()];
-        memset(dp, -1, sizeof(dp));
+        int n=arr.size();
+      vector<int>dp(n+1);
         
-        return maxSum(arr, k, dp, 0);
+       for(int i=n-1;i>=0;i--){
+        int mx=arr[i];
+        for(int j=i;j<n&&j<(i+k);j++){
+           mx=max(mx,arr[j]);
+           dp[i]=max(dp[i],dp[j+1]+(j-i+1)*mx);
+        }
+       }
+       return dp[0];
     }
 };
