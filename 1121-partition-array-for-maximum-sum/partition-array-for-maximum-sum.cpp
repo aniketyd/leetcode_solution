@@ -1,28 +1,33 @@
 class Solution {
 public:
-int K;
-    unordered_map<int ,unordered_map<int,int>>dp;
-    vector<vector<int>>mx;
-    int fun(vector<int>&arr,int i,int j){
-        if(i==arr.size())return 0;
-        if(dp[i].find(j)!=dp[i].end())return dp[i][j];
-        int m=fun(arr,i+1,i+1)+mx[j][i]*(i-j+1);
-        if(i-j+1!=K){
-            m=max(m,fun(arr,i+1,j));
+    int maxSum(vector<int>& arr, int k, int dp[], int start) {
+        int N = arr.size();
+        
+        if (start >= N) {
+            return 0;
         }
-        return dp[i][j]=m;
+        
+        // Return the already calculated answer.
+        if (dp[start] != -1) {
+            return dp[start];
+        }
+        
+        int currMax = 0, ans = 0;
+        int end = min(N, start + k);
+        for (int i = start; i < end; i++) {
+            currMax = max(currMax, arr[i]);
+            // Store the maximum of all options for the current subarray.
+            ans = max(ans, currMax * (i - start + 1) + maxSum(arr, k, dp, i + 1));
+        }
+
+        // Store the answer to be reused.
+        return dp[start] = ans;
     }
+    
     int maxSumAfterPartitioning(vector<int>& arr, int k) {
-        int n=arr.size();
-        K=k;
-        mx.resize(n+1,vector<int>(n+1));
-        for(int i=0;i<n;i++){
-            int m=arr[i];
-            for(int j=i;j<n;j++){
-                m=max(m,arr[j]);
-                mx[i][j]=m;
-            }
-        }
-        return fun(arr,0,0);
+        int dp[arr.size()];
+        memset(dp, -1, sizeof(dp));
+        
+        return maxSum(arr, k, dp, 0);
     }
 };
