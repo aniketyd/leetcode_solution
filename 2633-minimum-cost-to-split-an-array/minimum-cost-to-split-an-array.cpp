@@ -5,7 +5,7 @@ public:
         vector<long long>dp(n+1,1e16);
         dp[0]=0;
         for(int i=1;i<=n;i++){
-           unordered_map<int,int>mp;int c=0,cnt=0;
+           vector<int>mp(n+10);int c=0,cnt=0;
             for(int j=i;j<=n;j++){
                  mp[nums[j-1]]++;
                  if(mp[nums[j-1]]==2)c+=2;
