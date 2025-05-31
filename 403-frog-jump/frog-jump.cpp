@@ -1,25 +1,22 @@
 class Solution {
 public:
     bool canCross(vector<int>& stones) {
-        unordered_map<int, unordered_set<int>> mapa;
-
+        int n = stones.size();
+        unordered_map<int, unordered_set<int>> dp;
         for (int stone : stones) {
-            mapa[stone] = unordered_set<int>();
+            dp[stone] = unordered_set<int>();
         }
-
-        mapa[0].insert(0);
+        dp[0].insert(0);
 
         for (int stone : stones) {
-            for (int k : mapa[stone]) {
-                for (int i = k - 1; i <= k + 1; i++) {
-                    if (i > 0 && mapa.find(stone + i) != mapa.end()) {
-                        mapa[stone + i].insert(i);
+            for (int jump : dp[stone]) {
+                for (int step = jump - 1; step <= jump + 1; step++) {
+                    if (step > 0 && dp.count(stone + step)) {
+                        dp[stone + step].insert(step);
                     }
                 }
             }
         }
-
-
-        return mapa[stones.back()].size();
+        return !dp[stones.back()].empty();
     }
 };
