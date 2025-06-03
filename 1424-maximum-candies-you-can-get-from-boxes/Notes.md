@@ -1,1 +1,1 @@
-<h2>maximum-candies-you-can-get-from-boxes Notes</h2><hr>[ Time taken: 20 m 26 s ]
+<h2>maximum-candies-you-can-get-from-boxes Notes</h2><hr>[ Time taken: 1 m 17 s ]
