@@ -2,19 +2,18 @@ class Solution {
 public:
     int trap(vector<int>& v) {
         int n=v.size();
-        vector<int>ps(n,0);
-        int m=0,m2=0;
-        for(int i=0;i<n;i++)
-        {
-           
-            m2=max(m2,v[n-1-i]);
-            ps[n-1-i]=m2;
+        int l=0,r=n-1,leftMax=v[0],rightMax=0;
+        int ans=0;
+        while(r>=l){
+            leftMax=max(leftMax,v[l]);
+          while(r>=l&&rightMax<leftMax){
+            rightMax=max(rightMax,v[r]);
+            ans+=rightMax-v[r];
+            r--;
+          }
+          ans+=leftMax-v[l];
+          l++;
         }
-        int sum=0;
-        for(int i=0;i<n;i++)
-        {   m=max(m,v[i]);
-                 sum+=min(m,ps[i])-v[i];
-        }
-        return sum;
+        return ans;
     }
 };
