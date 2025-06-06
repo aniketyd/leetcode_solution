@@ -3,12 +3,12 @@ public:
     string minWindow(string s, string t) {
         int n=s.size();
         int m=t.size();
-        vector<int>curfreq(301),freq(301);
+        vector<int>curfreq(101),freq(101);
         for(int i=0;i<m;i++){
             freq[t[i]-'A']++;
         }
         int reqChar=0;
-        for(int i=0;i<200;i++)
+        for(int i=0;i<100;i++)
         if(freq[i]>0)reqChar++;
         int sz=1e9;
         int start,end;
