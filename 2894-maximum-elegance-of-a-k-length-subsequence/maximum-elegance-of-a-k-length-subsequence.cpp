@@ -2,51 +2,47 @@ class Solution {
 public:
 using ll = long long;
     long long findMaximumElegance(vector<vector<int>>& items, int k) {
-          unordered_map<int, vector<ll>> catProfits;
-        for (auto &it : items) {
-            ll profit = it[0];
-            int cat   = it[1];
-            catProfits[cat].push_back(profit);
+           sort(items.begin(), items.end(), [](auto &a, auto &b) {
+            return a[0] > b[0];  // Sort by profit descending
+        });
+
+        unordered_set<int> used_categories;
+        priority_queue<int, vector<int>, greater<int>> duplicate_heap; // min-heap
+        ll profit = 0;
+        ll maxElegance = 0;
+
+        // Step 1: Take first k items
+        for (int i = 0; i < k; ++i) {
+            profit += items[i][0];
+            int cat = items[i][1];
+            if (used_categories.count(cat)) {
+                duplicate_heap.push(items[i][0]); // potential replaceable
+            } else {
+                used_categories.insert(cat);
+            }
         }
-        
-        // 2) For each category, pick the top profit as "best",
-        //    and all the rest go into "extras"
-        vector<ll> bestProfits;
-        vector<ll> extras;
-        bestProfits.reserve(catProfits.size());
-        
-        for (auto &p : catProfits) {
-            auto &vec = p.second;
-            sort(vec.begin(), vec.end(), greater<ll>());
-            bestProfits.push_back(vec[0]);
-            for (int i = 1; i < vec.size(); ++i)
-                extras.push_back(vec[i]);
+
+        // Step 2: Compute elegance
+        int distinct = used_categories.size();
+        maxElegance = profit + 1LL * distinct * distinct;
+
+        // Step 3: Try replacing duplicates with new categories
+        for (int i = k; i < items.size(); ++i) {
+            int cat = items[i][1];
+            int val = items[i][0];
+
+            if (used_categories.count(cat)) continue; // already have this category
+
+            if (duplicate_heap.empty()) break; // no more to replace
+
+            int to_remove = duplicate_heap.top(); duplicate_heap.pop();
+            profit += val - to_remove;
+            used_categories.insert(cat);
+            distinct++;
+
+            maxElegance = max(maxElegance, profit + 1LL * distinct * distinct);
         }
-        
-        // 3) Sort both lists descending
-        sort(bestProfits.begin(), bestProfits.end(), greater<ll>());
-        sort(extras.begin(),      extras.end(),      greater<ll>());
-        
-        int m = bestProfits.size();
-        int e = extras.size();
-        
-        // 4) Build prefix sums
-        vector<ll> prefBest(m+1, 0), prefExtra(e+1, 0);
-        for (int i = 0; i < m; ++i) prefBest[i+1] = prefBest[i] + bestProfits[i];
-        for (int i = 0; i < e; ++i) prefExtra[i+1] = prefExtra[i] + extras[i];
-        
-        // 5) Try taking t distinct categories (with their top profits)
-        //    and (k - t) extras, for all valid t, track max elegance
-        ll ans = 0;
-        for (int t = 1; t <= m && t <= k; ++t) {
-            int needExtra = k - t;
-            if (needExtra > e) continue; // not enough extras
-            ll profitSum = prefBest[t] + prefExtra[needExtra];
-            ll elegance  = profitSum + 1LL * t * t;
-            ans = max(ans, elegance);
-        }
-        
-        return ans;
-    
+
+        return maxElegance;
     }
 };
