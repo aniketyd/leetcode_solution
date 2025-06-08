@@ -14,7 +14,7 @@ public:
                 return (i-prevIndx-1);
             }
             st.push(i);
-            cout<<i<<endl;
+         
         }
          while(!st.empty()){
             int i=n;
