@@ -1,52 +1,70 @@
 class Solution {
 public:
-    int minCost(int maxTime, vector<vector<int>>& edges, vector<int>& passingFees) {
-        int n = passingFees.size();
-        // build adjacency list: adj[u] = vector of {v, travel_time}
-        vector<vector<pair<int,int>>> adj(n);
-        for (auto& e : edges) {
-            int u = e[0], v = e[1], t = e[2];
-            adj[u].emplace_back(v, t);
-            adj[v].emplace_back(u, t);
+    vector<vector<int>> adj[1001];
+    int cost[1001], time[1001];
+    
+    int dijkstra(int src, int dest, int maxTime) {
+        
+        for (int i = 1; i <= dest; i++) {
+            cost[i] = INT_MAX;
+            time[i] = INT_MAX;
         }
         
-        const int INF = 1e9;
-        // fees[i] = min cost to reach i
-        // times[i] = min time to reach i (under the cheapest cost path so far)
-        vector<int> fees(n, INF), times(n, INF);
-        fees[0] = passingFees[0];
-        times[0] = 0;
+        priority_queue<vector<int>, vector<vector<int>>, greater<vector<int>>> pq;
+        pq.push({cost[src], time[src], src});
         
-        // min-heap of (cost so far, time so far, node)
-        using T = tuple<int,int,int>;
-        priority_queue<T, vector<T>, greater<T>> pq;
-        pq.emplace(fees[0], 0, 0);
-        
-        while (!pq.empty()) {
-            auto [cost, time, u] = pq.top(); 
-            pq.pop();
-            // if we've already found a strictly better way to u, skip
-            if (cost > fees[u] && time > times[u]) 
-                continue;
+        while (pq.empty() == 0) {
+            vector<int> z = pq.top(); pq.pop();
             
-            // try all outgoing edges
-            for (auto& [v, wt] : adj[u]) {
-                int newTime = time + wt;
-                if (newTime > maxTime) 
-                    continue;
-                int newCost = cost + passingFees[v];
+            int c = z[0];     // cost
+            int t = z[1];     // time
+            int v = z[2];     // vertex
+            
+            for (int i=0;i<adj[v].size();i++) {
                 
-                // if we improve on cost or on time, we should revisit v
-                if (newCost < fees[v] || newTime < times[v]) {
-                    if (newCost < fees[v]) 
-                        fees[v] = newCost;
-                    if (newTime < times[v]) 
-                        times[v] = newTime;
-                    pq.emplace(newCost, newTime, v);
+			    // if this edge does not cause the time to exceed maxTime
+                if (t + adj[v][i][1] <= maxTime) {
+                    
+				    // if cost will decrease
+                    if (cost[adj[v][i][0]] > c + adj[v][i][2]) {
+                        cost[adj[v][i][0]] = c + adj[v][i][2];
+                        
+                        time[adj[v][i][0]] = t + adj[v][i][1];
+                        pq.push({cost[adj[v][i][0]], time[adj[v][i][0]], adj[v][i][0]});
+                    }
+                    
+					// if time will decrease
+                    else if (time[adj[v][i][0]] > t + adj[v][i][1]) {
+                        time[adj[v][i][0]] = t + adj[v][i][1];
+                        pq.push({c + adj[v][i][2], time[adj[v][i][0]], adj[v][i][0]});
+                    }
                 }
             }
         }
         
-        return (fees[n-1] < INF ? fees[n-1] : -1);
+        return cost[dest];
+    }
+    
+    int minCost(int maxTime, vector<vector<int>>& edges, vector<int>& fee) {
+        int i, x, y, t, e = edges.size(), n = fee.size();
+        
+        for (i=0;i<e;i++) {
+            x = edges[i][0];
+            y = edges[i][1];
+            t = edges[i][2];
+            
+            adj[x].push_back({y, t, fee[y]});
+            adj[y].push_back({x, t, fee[x]});
+        }
+        
+        cost[0] = fee[0];
+        time[0] = 0;
+        
+        int ans = dijkstra(0, n-1, maxTime);
+        
+        if(ans == INT_MAX)
+            return -1;
+        
+        return ans;
     }
 };
