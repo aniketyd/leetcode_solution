@@ -14,16 +14,16 @@ public:
             dq.pop_front();
             for (auto [dx, dy] : directions) {
                 int nx = x + dx, ny = y + dy;
-                if (nx >= 0 && nx < m && ny >= 0 && ny < n&&distance[nx][ny]==INT_MAX) {
+                if (nx >= 0 && nx < m && ny >= 0 && ny < n) {
                     int newDist = distance[x][y] + grid[nx][ny];
-                    
+                    if (newDist < distance[nx][ny]) {
                         distance[nx][ny] = newDist;
                         if (grid[nx][ny] == 0) {
                             dq.push_front({nx, ny});
                         } else {
                             dq.push_back({nx, ny});
                         }
-                    
+                    }
                 }
             }
         }
