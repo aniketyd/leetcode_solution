@@ -1,7 +1,7 @@
 class Solution {
 public:
     
-    static bool comp(vector<int> lhs, vector<int> rhs)
+    static bool comp(vector<int> &lhs, vector<int> &rhs)
     {
         if(lhs[1]<rhs[1] || (lhs[1]==rhs[1] && lhs[2]<rhs[2]))
             return true ;
