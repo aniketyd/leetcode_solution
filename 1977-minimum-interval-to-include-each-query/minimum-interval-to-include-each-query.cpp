@@ -1,32 +1,23 @@
 class Solution {
 public:
-    vector<int> minInterval(vector<vector<int>>& intervals, vector<int>& queries) {
-       multiset<pair<int,int>>st;
-       int n=queries.size();
-       for(int i=0;i<n;i++){
-        st.insert({queries[i],i});
-       } 
-       int m=intervals.size();
-       for(int i=0;i<m;i++){
-        intervals[i][0]=intervals[i][1]-intervals[i][0]+1;
-       }
-       sort(intervals.begin(),intervals.end());
-       vector<int>ans(n,-1);
-       for(int i=0;i<m;i++){
-            int l=intervals[i][1]-intervals[i][0]+1;
-            int r=intervals[i][1];
-            stack<pair<int,int>>tempStore;
-            auto start=st.lower_bound({l,-1});
-            auto end=st.upper_bound({r,1e9});
-            for(auto it=start;it!=end;++it){
-                tempStore.push(*it);
-                ans[(*it).second]=intervals[i][0];
+        vector<int> minInterval(vector<vector<int>>& A, vector<int>& queries) {
+        priority_queue<vector<int>> pq;
+        unordered_map<int, int> res;
+        vector<int> Q = queries, res2;
+        sort(A.begin(), A.end());
+        sort(Q.begin(), Q.end());
+        int i = 0, n = A.size();
+        for (int q : Q) {
+            while (i < n && A[i][0] <= q) {
+                int l = A[i][0], r = A[i++][1];
+                pq.push({l - r - 1, r});
             }
-            while(!tempStore.empty()){
-                st.erase(st.find(tempStore.top()));
-                tempStore.pop();
-            }
-       }
-       return ans;
+            while (pq.size() && pq.top()[1] < q)
+                pq.pop();
+            res[q] = pq.size() ? -pq.top()[0] : -1;
+        }
+        for (int q : queries)
+            res2.push_back(res[q]);
+        return res2;
     }
 };
