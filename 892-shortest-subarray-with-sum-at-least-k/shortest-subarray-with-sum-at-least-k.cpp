@@ -26,7 +26,7 @@ public:
                 int k=i+2-((*it).second);
                 if((*it).second==0)k--;
             ans=min(ans,k);
-            cout<<i<<' '<<((*it).second)<<endl;
+            
             }
             else if(it!=st.begin()){
                 --it;
@@ -34,7 +34,7 @@ public:
                 int k=i+2-((*it).second)-1;
                
             ans=min(ans,k);
-            cout<<i<<' '<<((*it).second)<<endl;
+           
             }
             }
            
