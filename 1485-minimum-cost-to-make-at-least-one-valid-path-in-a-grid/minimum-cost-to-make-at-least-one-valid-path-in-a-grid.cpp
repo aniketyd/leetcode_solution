@@ -1,32 +1,40 @@
 class Solution {
 public:
+    int direction(int nX,int nY,int x,int y){
+        if(nY-y==1)return 1;
+        if(nY-y==-1)return 2;
+        if(nX-x==1)return 3;
+        return 4;
+    }
     int minCost(vector<vector<int>>& grid) {
-        int m = grid.size(), n = grid[0].size();
-        vector<vector<int>> dist(m, vector<int>(n, INT_MAX));
-        deque<pair<int, int>> dq;
-        int dx[4] = {0, 0, 1, -1}, dy[4] = {1, -1, 0, 0};
-        
-        dq.push_front({0, 0});
-        dist[0][0] = 0;
-
-        while (!dq.empty()) {
-            auto [x, y] = dq.front();
+        int n= grid.size(), m = grid[0].size();
+        deque<pair<int,pair<int,int>>>dq;
+        dq.push_front({0,{0,0}});
+        int adx[4]={0,1,0,-1};
+        int ady[4]={1,0,-1,0};
+        vector<vector<int>>dis(n,vector<int>(m,1e9));
+        dis[0][0]=0;
+        while(!dq.empty()){
+            auto val=dq.front();
+            int wt=val.first;
+            int x=val.second.first;
+            int y=val.second.second;
             dq.pop_front();
-            int curDir = grid[x][y] - 1;
-
-            for (int dir = 0; dir < 4; dir++) {
-                int nx = x + dx[dir], ny = y + dy[dir];
-                if (nx < 0 || ny < 0 || nx >= m || ny >= n) continue;
-
-                int cost = dist[x][y] + (dir == curDir ? 0 : 1);
-                if (cost < dist[nx][ny]) {
-                    dist[nx][ny] = cost;
-                    if (dir == curDir) dq.push_front({nx, ny});
-                    else dq.push_back({nx, ny});
+            if(x==n-1&&y==m-1)return wt;
+            if(dis[x][y]<wt)continue;
+            for(int k=0;k<4;k++){
+                int nX=x+adx[k];
+                int nY=y+ady[k];
+                int cost=(direction(nX,nY,x,y)==grid[x][y])?0:1;
+                if(nX>=0&&nX<n&&nY>=0&&nY<m&&dis[nX][nY]>(wt+cost)){
+                    dis[nX][nY]=wt+cost;
+                    if(cost==0)
+                    dq.push_front({wt,{nX,nY}});
+                    else
+                    dq.push_back({wt+1,{nX,nY}});
                 }
             }
         }
-
-        return dist[m - 1][n - 1];
+        return 0;
     }
 };
