@@ -1,66 +1,30 @@
-#include <bits/stdc++.h>
-using namespace std;
-
 class Solution {
 public:
-    long long maxValue(vector<vector<int>>& events, int k) {
-        int n = events.size();
-        // 1. Sort events by end day (ascending)
-        sort(events.begin(), events.end(), [](const auto &a, const auto &b) {
-            return a[1] < b[1];
-        });
-        
-        // 2. Extract the end days into a separate array for binary search
-        vector<int> ends(n);
-        for (int i = 0; i < n; ++i) {
-            ends[i] = events[i][1];
+    vector<int>temp;
+    vector<vector<int>>dp;
+    int fun(vector<vector<int>>&events,int k,int n){
+            if(n<0||k==0)return 0;
+            if(dp[n][k]!=-1)return dp[n][k];
+            int take=events[n][2];
+            auto indx=lower_bound(temp.begin(),temp.end(),events[n][0])-temp.begin();
+            if(indx!=0)
+            take+=fun(events,k-1,indx-1);
+            int not_take=fun(events,k,n-1);
+            dp[n][k]=max(take,not_take);
+            return dp[n][k];
+
+    }
+    static bool cmp(vector<int>&v1,vector<int>&v2){
+        return v1[1]<v2[1];
+    }
+    int maxValue(vector<vector<int>>& events, int k) {
+        int n=events.size();
+        sort(events.begin(),events.end(),cmp);
+        for(int i=0;i<n;i++){
+            temp.push_back(events[i][1]);
         }
-        
-        // 3. DP table: dp[i][j] = max value by choosing at most j events
-        //    from among the first i events (1-based in DP).
-        //    We allocate (n+1) x (k+1), initialize all to 0.
-        vector<vector<long long>> dp(n + 1, vector<long long>(k + 1, 0LL));
-        
-        // 4. Fill the DP table
-        //    i loops from 1..n (refers to events[i-1])
-        for (int i = 1; i <= n; ++i) {
-            int start_i = events[i - 1][0];
-            int value_i = events[i - 1][2];
-            
-            // Find the last event index p (0-based) whose end < start_i
-            // Among events[0..i-2], we look for the first end >= start_i,
-            // then go one step back.
-            int lo = 0, hi = i - 1; 
-            // binary_search for the first index in [0..i-2] with ends[idx] >= start_i
-            int p = -1;
-            {
-                auto it = lower_bound(ends.begin(), ends.begin() + (i - 1), start_i);
-                if (it == ends.begin()) {
-                    // no event ends before start_i
-                    p = -1;
-                } else {
-                    // step one back
-                    p = int(it - ends.begin()) - 1;
-                }
-            }
-            
-            // Now fill dp[i][j] for j = 1..k
-            for (int j = 1; j <= k; ++j) {
-                // Option 1: skip event i
-                long long skip = dp[i - 1][j];
-                
-                // Option 2: take event i → add value_i to dp[p+1][j-1], if p >= 0
-                long long take = value_i;
-                if (p >= 0) {
-                    take += dp[p + 1][j - 1];
-                }
-                
-                dp[i][j] = max(skip, take);
-            }
-       
-        }
-        
-        
-        return dp[n][k];
+        dp.resize(n+1,vector<int>(k+1,-1));
+        return fun(events,k,n-1);
+
     }
 };
