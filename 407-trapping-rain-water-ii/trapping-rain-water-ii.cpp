@@ -6,20 +6,20 @@ public:
         int n=h.size();
         int m=h[0].size();
         priority_queue<tuple<int,int,int>,vector<tuple<int,int,int>>,greater<tuple<int,int,int>>>pq;
-        vector<vector<int>>vis(n,vector<int>(m)),mi(n,vector<int>(m));
+        vector<vector<int>>vis(n,vector<int>(m)),mi(n,vector<int>(m,1e8));
         for(int i=0;i<n;i++){
-            vis[i][0]=1;
+            mi[i][0]=h[i][0];
             pq.push(make_tuple(h[i][0],i,0));
-            if(!vis[i][m-1]){
-                vis[i][m-1]=1;
+            if(mi[i][m-1]==1e8){
+                mi[i][m-1]=h[i][m-1];
                  pq.push(make_tuple(h[i][m-1],i,m-1));
             }
         }
         for(int i=1;i<m-1;i++){
-            vis[0][i]=1;
+            mi[0][i]=h[0][i];
             pq.push(make_tuple(h[0][i],0,i));
-            if(!vis[n-1][i]){
-                vis[n-1][i]=1;
+            if(mi[n-1][i]==1e8){
+                mi[n-1][i]=h[n-1][i];
                  pq.push(make_tuple(h[n-1][i],n-1,i));
             }
         }
@@ -29,16 +29,12 @@ public:
             auto tp=pq.top();pq.pop();
           int ht = get<0>(tp), x = get<1>(tp), y = get<2>(tp);
             for(int i=0;i<4;i++){
-                int xx=x+adx[i];int yy=y+ady[i];
-                if(xx>=0&&xx<n&&yy>=0&&yy<m&&!vis[xx][yy]){
-                    vis[xx][yy]=1;
-                    mi[xx][yy]=max(ht,h[xx][yy]);
-                    if(ht<h[xx][yy]){
-                        pq.push(make_tuple(h[xx][yy],xx,yy));
-                    }
-                    else{
-                        pq.push(make_tuple(ht,xx,yy));
-                    }
+                int xx=x+adx[i];
+                int yy=y+ady[i];
+                if(xx>=0&&xx<n&&yy>=0&&yy<m&&mi[xx][yy]>max(ht,h[xx][yy])){
+                   mi[xx][yy]=max(ht,h[xx][yy]);
+                   pq.push(make_tuple(mi[xx][yy],xx,yy));
+                  
                 }
             }
         }
