@@ -1,49 +1,60 @@
 class Solution {
 public:
-   int fun(int time, int change, int val){
-    int ans=0;
-       for(int i=0;i<val-1;i++){
-            ans+=time;
-            if(((ans+change)/change)%2==0){
-                ans=((ans+change)/change)*change;
-            }
-       }
-       ans+=time;
-       return ans;
-   }
     int secondMinimum(int n, vector<vector<int>>& edges, int time, int change) {
-        vector<vector<int>>adj(n+1);
-        int m=edges.size();
-        for(int i=0;i<m;i++){
-            adj[edges[i][0]].push_back(edges[i][1]);
-            adj[edges[i][1]].push_back(edges[i][0]);
-        }
-        queue<int>q;
-        vector<int>vis(n+1);
-        vector<vector<int>>val(n+1,vector<int>(2));
-        q.push(1);
-        vis[1]=1;
-        int c=1;
-        while(!q.empty()){
-              int s=q.size();
-              for(int i=0;i<s;i++){
-                  int top=q.front();q.pop();
-                  for(auto adjNode:adj[top]){
-                    if(vis[adjNode]==0){
-                       vis[adjNode]=1;
-                       val[adjNode][0]=c;
-                       q.push({adjNode});
-                    }
-                    else if(vis[adjNode]==1&&val[adjNode][0]<c){
-                           vis[adjNode]=2;
-                           val[adjNode][1]=c;
-                           q.push({adjNode});
-                    }
-                  }
-              }
-              c++;
+        // if the shortest path from 1 to n is of length L
+        // find whether there is a path of length L+1
+        // there is always a path of length L+2
+        
+        vector<vector<int>> adj(n);
+        for (auto& e : edges) {
+            int u = e[0]-1, v = e[1]-1;
+            adj[u].push_back(v);
+            adj[v].push_back(u);
         }
         
-        return fun(time,change,val[n][1]);
+        // bfs from goal
+        vector<int> d(n, 1e9);
+        d[n-1] = 0;
+        queue<int> q;
+        q.push(n-1);
+        while (!q.empty()) {
+            int cur = q.front(); q.pop();
+            for (auto nei : adj[cur]) {
+                if (d[nei] == 1e9) {
+                    d[nei] = d[cur] + 1;
+                    q.push(nei);
+                }
+            }
+        }
+        
+        // check the existence of a path with length = d[0]+1
+        int len = d[0] + 2;
+        q.push(0);
+        bool done = false;
+        while (!q.empty()) {
+            int cur = q.front(); q.pop();
+            for (auto nei : adj[cur]) {
+                if (d[nei] == d[cur]) {
+                    len--;
+                    done = true;
+                    break;
+                } else if (d[nei] == d[cur] - 1) {
+                    q.push(nei);
+                }
+            }
+            if (done) break;
+        }
+        
+        // calculate the time needed
+        // light : green in [0, c),  [2c, 3c), ... 
+        //          red  in [c, 2c), [3c, 4c), ...
+        int currTime = 0;
+        //cout << len << '\n';
+        for (int i = 0; i < len; i++) {
+			if ((currTime / change) % 2 == 1)  // have to wait until the signal turns into green
+                currTime = ((currTime / change) + 1) * change;    
+            currTime += time;
+        }
+        return currTime;
     }
 };
